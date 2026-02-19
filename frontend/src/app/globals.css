@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0d1f0d;
+  --foreground: #e8f0e8;
+  --forest-deep: #0a1810;
+  --forest-mid: #142a18;
+  --forest-light: #1e3d24;
+  --forest-gold: rgba(212, 175, 55, 0.15);
+  --leaf-color: rgba(76, 153, 0, 0.4);
+  --mist-color: rgba(180, 220, 180, 0.03);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* ========== Forest Background ========== */
+.forest-background {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.forest-gradient {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 120% 80% at 50% 0%, var(--forest-light) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 60% at 20% 80%, var(--forest-mid) 0%, transparent 40%),
+    radial-gradient(ellipse 70% 50% at 80% 70%, var(--forest-mid) 0%, transparent 35%),
+    linear-gradient(180deg, var(--forest-deep) 0%, #051008 100%);
+  animation: gradient-shift 12s ease-in-out infinite alternate;
+}
+
+@keyframes gradient-shift {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.95; transform: scale(1.02); }
+}
+
+/* Dappled sunlight through canopy */
+.sunbeam {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--forest-gold);
+  animation: sunbeam-pulse 6s ease-in-out infinite;
+}
+
+.sunbeam-1 { width: 30vw; height: 30vw; top: 5%; left: 10%; animation-delay: 0s; }
+.sunbeam-2 { width: 25vw; height: 25vw; top: 15%; right: 15%; animation-delay: 1.2s; }
+.sunbeam-3 { width: 20vw; height: 20vw; bottom: 25%; left: 5%; animation-delay: 2.4s; }
+.sunbeam-4 { width: 35vw; height: 35vw; bottom: 10%; right: 5%; animation-delay: 0.8s; }
+.sunbeam-5 { width: 18vw; height: 18vw; top: 40%; left: 40%; animation-delay: 3s; }
+
+@keyframes sunbeam-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+/* Floating leaves / nature particles */
+.leaf {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--leaf-color);
+  border-radius: 2px;
+  animation: leaf-float var(--leaf-duration, 10s) ease-in-out infinite;
+  animation-delay: var(--leaf-delay, 0s);
+  left: var(--leaf-start, 0%);
+  top: -20px;
+}
+
+.leaf-1 { border-radius: 50% 0 50% 50%; }
+.leaf-2 { border-radius: 0 50% 50% 50%; width: 6px; height: 10px; }
+.leaf-3 { border-radius: 50% 50% 0 50%; width: 10px; height: 6px; }
+.leaf-4 { border-radius: 50% 50% 50% 0; }
+
+@keyframes leaf-float {
+  0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0.6; }
+  25% { transform: translateY(25vh) translateX(5vw) rotate(90deg); opacity: 0.9; }
+  50% { transform: translateY(50vh) translateX(-3vw) rotate(180deg); opacity: 0.5; }
+  75% { transform: translateY(75vh) translateX(4vw) rotate(270deg); opacity: 0.8; }
+  100% { transform: translateY(100vh) translateX(0) rotate(360deg); opacity: 0.6; }
+}
+
+/* Mist / atmospheric depth */
+.mist-layer {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 100% 100% at 50% 50%, var(--mist-color) 0%, transparent 70%);
+  animation: mist-drift 20s ease-in-out infinite;
+}
+
+.mist-2 { animation-delay: -10s; animation-duration: 25s; }
+
+@keyframes mist-drift {
+  0%, 100% { opacity: 0.5; transform: translateX(0) scale(1); }
+  50% { opacity: 0.8; transform: translateX(2%) scale(1.02); }
+}
+
+/* ========== Star Explosion Button ========== */
+.star-explosion-container {
+  position: relative;
+  display: inline-flex;
+}
+
+.star-particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, #ffeb3b 0%, #ff9800 60%, transparent 100%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: star-burst 0.8s ease-out forwards;
+}
+
+@keyframes star-burst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  40% {
+    opacity: 1;
+    transform: var(--star-transform) scale(1.3);
+  }
+  100% {
+    opacity: 0.9;
+    transform: var(--star-transform) scale(1);
+  }
+}
