@@ -20,18 +20,19 @@ app.add_middleware(
 def get_openai_client():
     # client = OpenAI()
                                                                     
-    client = OpenAI(
+    if os.getenv("GEMINI_API_KEY"):
+        return OpenAI(
         api_key=os.environ["GEMINI_API_KEY"],
         base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
     )
 
-    # client = AzureOpenAI(
-    #           azure_endpoint=os.environ["AZURE_API_BASE"],
-    #           api_key=os.environ["AZURE_API_KEY"],
-    #           api_version=os.environ["AZURE_API_VERSION"],
-    #       )
-    
-    return client
+    if os.getenv("OPENAI_API_KEY"):
+        return AzureOpenAI(
+              azure_endpoint=os.environ["AZURE_API_BASE"],
+              api_key=os.environ["AZURE_API_KEY"],
+              api_version=os.environ["AZURE_API_VERSION"],
+          )
+    return None
 
 client = get_openai_client()
 
@@ -45,13 +46,16 @@ def root():
 
 @app.post("/api/chat")
 def chat(request: ChatRequest):
-    if not os.getenv("OPENAI_API_KEY"):
-        raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured")
+    if not client:
+        raise HTTPException(
+            status_code=500,
+            detail="GEMINI_API_KEY or OPENAI_API_KEY must be set in environment",
+        )
     
     try:
         user_message = request.message
         response = client.chat.completions.create(
-            model=os.getenv("OPENAI_MODEL", "gpt-4"),
+            model=os.getenv("OPENAI_MODEL", os.getenv("GEMINI_MODEL", "gpt-4")),
             messages=[
                 {"role": "system", "content": "You are a supportive mental coach."},
                 {"role": "user", "content": user_message}
@@ -59,4 +63,4 @@ def chat(request: ChatRequest):
         )
         return {"reply": response.choices[0].message.content}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error calling OpenAI API: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error calling model API: {str(e)}")
