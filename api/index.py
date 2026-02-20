@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from openai import OpenAI
+from openai import AzureOpenAI, OpenAI
 import os
 from dotenv import load_dotenv
 
@@ -17,7 +17,24 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+def get_openai_client():
+    # client = OpenAI()
+                                                                    
+    client = OpenAI(
+        api_key=os.environ["GEMINI_API_KEY"],
+        base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+    )
+
+    # client = AzureOpenAI(
+    #           azure_endpoint=os.environ["AZURE_API_BASE"],
+    #           api_key=os.environ["AZURE_API_KEY"],
+    #           api_version=os.environ["AZURE_API_VERSION"],
+    #       )
+    
+    return client
+
+client = get_openai_client()
+
 
 class ChatRequest(BaseModel):
     message: str
@@ -34,7 +51,7 @@ def chat(request: ChatRequest):
     try:
         user_message = request.message
         response = client.chat.completions.create(
-            model="gpt-5",
+            model=os.getenv("OPENAI_MODEL", "gpt-4"),
             messages=[
                 {"role": "system", "content": "You are a supportive mental coach."},
                 {"role": "user", "content": user_message}

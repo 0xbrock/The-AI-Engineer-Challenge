@@ -60,7 +60,7 @@ The app is set up for a single Vercel deployment: Next.js frontend + Python `/ap
 ### 1. Connect the repo
 
 1. Go to [vercel.com/new](https://vercel.com/new) and import your Git repository.
-2. Set **Root Directory** to `frontend` (click “Edit” next to the root and enter `frontend`).
+2. **Important:** Set **Root Directory** to `frontend` (click “Edit” next to the root and enter `frontend`). If you skip this, the root URL will show `{"status":"ok"}` from the repo’s API instead of the chat UI.
 3. Add environment variables in **Settings → Environment Variables**:
    - **`GEMINI_API_KEY`** — for Gemini (recommended), or  
    - **`OPENAI_API_KEY`** — for OpenAI.  
@@ -78,6 +78,10 @@ vercel
 ```
 
 When prompted, set the project root to the current directory (`.`). Add `GEMINI_API_KEY` or `OPENAI_API_KEY` in the Vercel project settings (or via `vercel env add`).
+
+### If the root URL shows `{"status":"ok"}`
+
+The project is building from the repo root instead of the frontend. In Vercel: **Project → Settings → General → Root Directory** → set to `frontend` and save, then redeploy.
 
 ## Scripts
 
