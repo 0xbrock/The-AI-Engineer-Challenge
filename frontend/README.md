@@ -34,15 +34,50 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). The frontend proxies `/api/*` to the backend automatically.
+Set the API URL so the frontend proxies to the backend (optional; only needed when using the separate backend):
+
+```bash
+export NEXT_PUBLIC_API_URL=http://localhost:8000
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
 
 ### 3. (Optional) Custom API URL
 
-To use a different backend URL (e.g. production), set:
+To use a different backend URL (e.g. another host), set:
 
 ```bash
 NEXT_PUBLIC_API_URL=https://your-api.example.com
 ```
+
+Leave **unset** when deploying to Vercel so `/api/chat` is served by the built-in Python function.
+
+## Deploy to Vercel
+
+The app is set up for a single Vercel deployment: Next.js frontend + Python `/api/chat` serverless function.
+
+### 1. Connect the repo
+
+1. Go to [vercel.com/new](https://vercel.com/new) and import your Git repository.
+2. Set **Root Directory** to `frontend` (click “Edit” next to the root and enter `frontend`).
+3. Add environment variables in **Settings → Environment Variables**:
+   - **`GEMINI_API_KEY`** — for Gemini (recommended), or  
+   - **`OPENAI_API_KEY`** — for OpenAI.  
+   Optionally: **`OPENAI_MODEL`** or **`GEMINI_MODEL`** (e.g. `gpt-4`, `gpt-4o-mini`).
+4. Deploy. The first deployment will build the Next.js app and the Python API.
+
+### 2. Deploy from CLI
+
+From the **frontend** directory:
+
+```bash
+cd frontend
+npm i -g vercel
+vercel
+```
+
+When prompted, set the project root to the current directory (`.`). Add `GEMINI_API_KEY` or `OPENAI_API_KEY` in the Vercel project settings (or via `vercel env add`).
 
 ## Scripts
 
