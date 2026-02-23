@@ -37,8 +37,12 @@ def get_openai_client():
 client = get_openai_client()
 
 
+class Message(BaseModel):
+    role: str
+    content: str
+
 class ChatRequest(BaseModel):
-    message: str
+    messages: list[Message]
 
 @app.get("/")
 def root():
@@ -51,15 +55,13 @@ def chat(request: ChatRequest):
             status_code=500,
             detail="GEMINI_API_KEY or OPENAI_API_KEY must be set in environment",
         )
-    
+
     try:
-        user_message = request.message
+        system = {"role": "system", "content": "You are a supportive mental coach."}
+        history = [{"role": m.role, "content": m.content} for m in request.messages]
         response = client.chat.completions.create(
             model=os.getenv("OPENAI_MODEL", os.getenv("GEMINI_MODEL", "gpt-4")),
-            messages=[
-                {"role": "system", "content": "You are a supportive mental coach."},
-                {"role": "user", "content": user_message}
-            ]
+            messages=[system, *history],
         )
         return {"reply": response.choices[0].message.content}
     except Exception as e:

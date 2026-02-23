@@ -40,7 +40,7 @@ describe("useChat", () => {
     });
   });
 
-  it("fetches from correct URL with message", async () => {
+  it("fetches from correct URL with messages array", async () => {
     mockFetch.mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ reply: "Test reply" }),
@@ -58,10 +58,39 @@ describe("useChat", () => {
         expect.objectContaining({
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: "Test message" }),
+          body: JSON.stringify({
+            messages: [{ role: "user", content: "Test message" }],
+          }),
         })
       );
     });
+  });
+
+  it("sends full conversation history on second message", async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ reply: "Got it" }),
+    });
+
+    const { result } = renderHook(() => useChat(""));
+
+    await act(async () => {
+      result.current.sendMessage("First");
+    });
+    await waitFor(() => expect(result.current.messages).toHaveLength(2));
+
+    await act(async () => {
+      result.current.sendMessage("Second");
+    });
+    await waitFor(() => expect(result.current.messages).toHaveLength(4));
+
+    const secondCallBody = JSON.parse(
+      (mockFetch.mock.calls[1][1] as RequestInit).body as string
+    );
+    expect(secondCallBody.messages).toHaveLength(3);
+    expect(secondCallBody.messages[0]).toEqual({ role: "user", content: "First" });
+    expect(secondCallBody.messages[1]).toEqual({ role: "assistant", content: "Got it" });
+    expect(secondCallBody.messages[2]).toEqual({ role: "user", content: "Second" });
   });
 
   it("adds assistant message on successful response", async () => {

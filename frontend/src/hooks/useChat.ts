@@ -21,7 +21,8 @@ export function useChat(apiBaseUrl: string = "") {
       if (!content.trim() || isLoading) return;
 
       const userMessage: ChatMessage = { role: "user", content: content.trim() };
-      setMessages((prev) => [...prev, userMessage]);
+      const updatedMessages = [...messages, userMessage];
+      setMessages(updatedMessages);
       setIsLoading(true);
       setError(null);
 
@@ -32,7 +33,7 @@ export function useChat(apiBaseUrl: string = "") {
         const res = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: content.trim() }),
+          body: JSON.stringify({ messages: updatedMessages }),
         });
 
         if (!res.ok) {
@@ -54,7 +55,7 @@ export function useChat(apiBaseUrl: string = "") {
         setIsLoading(false);
       }
     },
-    [apiBaseUrl, isLoading]
+    [apiBaseUrl, isLoading, messages]
   );
 
   return { messages, isLoading, error, sendMessage };
